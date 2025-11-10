@@ -1,54 +1,84 @@
 // /api/send-invite.js
-
-export default async function handler(req) {
+export default async function handler(req, res) {
   try {
-    const { email, trap } = await req.json();
+    if (req.method !== 'POST') {
+      return res.status(405).json({ ok: false, error: 'Method not allowed' });
+    }
+
+    const { email, trap } = req.body || {};
 
     // Honeypot
-    if (trap) {
-      return new Response(JSON.stringify({ ok: false, error: "Bot blocked" }), { status: 400 });
+    if (trap) return res.status(400).json({ ok: false, error: 'Bot blocked' });
+
+    // Gmail-only
+    if (!email || !email.endsWith('@gmail.com')) {
+      return res.status(400).json({ ok: false, error: 'Gmail only' });
     }
 
-    // Gmail only
-    if (!email || !email.endsWith("@gmail.com")) {
-      return new Response(JSON.stringify({ ok: false, error: "Gmail only" }), { status: 400 });
-    }
-
-    // RATE LIMIT – 1 request / 30 sec
-    const ip = req.headers.get("x-forwarded-for") || "unknown";
-    globalThis.limits = globalThis.limits || {};
+    // RATE LIMIT (1 request per IP / 30s)
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    global.limits = global.limits || {};
     const now = Date.now();
+    if (global.limits[ip] && now - global.limits[ip] < 30_000) {
+      return res.status(429).json({ ok: false, error: 'Too many requests. Try again.' });
+    }
+    global.limits[ip] = now;
 
-    if (globalThis.limits[ip] && now - globalThis.limits[ip] < 30000) {
-      return new Response(JSON.stringify({ ok: false, error: "Too many requests. Try again." }), { status: 429 });
+    // LOG (in-memory)
+    global.inviteLog = global.inviteLog || [];
+    global.inviteLog.push({ email, time: new Date().toISOString(), ip });
+
+    // RESEND config (use process.env in Node)
+    const apiKey = process.env.RESEND_API_KEY;
+    const link = process.env.TEST_LINK;
+
+    if (!apiKey) {
+      return res.status(500).json({ ok: false, error: 'Missing RESEND_API_KEY on server' });
+    }
+    if (!link) {
+      return res.status(500).json({ ok: false, error: 'Missing TEST_LINK on server' });
     }
 
-    globalThis.limits[ip] = now;
+    // call Resend with a timeout (AbortController)
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10_000); // 10s timeout
 
-    // LOG STORAGE
-    globalThis.inviteLog = globalThis.inviteLog || [];
-    globalThis.inviteLog.push({ email, time: new Date().toISOString(), ip });
+    let r;
+    try {
+      r = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Zvek Tap Hero <onboarding@resend.dev>',
+          to: email,
+          subject: 'Your Zvek Tap Hero Access Link',
+          html: `<h1>Zvek Access Granted</h1><p>Your link:</p><a href="${link}">${link}</a>`
+        }),
+        signal: controller.signal
+      });
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        return res.status(504).json({ ok: false, error: 'Upstream request timed out' });
+      }
+      return res.status(500).json({ ok: false, error: 'Network error: ' + err.message });
+    } finally {
+      clearTimeout(timeout);
+    }
 
-    // Resend API
-    const apiKey = Deno.env.get("RESEND_API_KEY");
-    const link = Deno.env.get("TEST_LINK");
+    const text = await r.text().catch(()=> '');
+    // return different codes for non-2xx
+    if (!r.ok) {
+      // preserve useful message if available
+      let detail = text;
+      try { detail = JSON.parse(text); } catch(e) {}
+      return res.status(r.status).json({ ok: false, error: 'Resend error', detail });
+    }
 
-    const r = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        from: "Zvek Tap Hero <onboarding@resend.dev>",
-        to: email,
-        subject: "Your Zvek Tap Hero Access Link",
-        html: `<h1>Access Granted</h1><p>Tap below:</p><a href="${link}">${link}</a>`
-      })
-    });
-
-    return new Response(JSON.stringify({ ok: true }), { status: 200 });
+    return res.status(200).json({ ok: true });
   } catch (err) {
-    return new Response(JSON.stringify({ ok: false, error: err.message }), { status: 500 });
+    return res.status(500).json({ ok: false, error: err.message });
   }
 }
