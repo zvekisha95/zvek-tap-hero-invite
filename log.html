@@ -1,16 +1,56 @@
 <!doctype html>
-<html>
-<body style="background:#111; margin:0;">
-<pre id="out" style="color:white; font-size:15px; padding:20px;"></pre>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zvek Tap Hero — Invite Log</title>
 
-<script>
-fetch("/api/log")
-  .then(r=>r.json())
-  .then(d=>{
-    document.getElementById("out").textContent =
-      JSON.stringify(d,null,2);
-  });
-</script>
+<style>
+  body {
+    background:#0b0b0b;
+    margin:0;
+    padding:20px;
+    font-family: monospace;
+    color:#fff;
+    overflow-x:hidden;
+  }
 
+  h1 {
+    font-size:24px;
+    color:#ff8f1f;
+    text-align:center;
+    margin-bottom:20px;
+  }
+
+  pre {
+    background:#111;
+    padding:20px;
+    border-radius:12px;
+    font-size:14px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    border:1px solid #222;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+  }
+</style>
+</head>
+
+<body>
+  <h1>Invite Log</h1>
+
+  <pre id="out">Loading…</pre>
+
+  <script>
+    fetch("/api/log")
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById("out").textContent =
+          JSON.stringify(data, null, 2);
+      })
+      .catch(() => {
+        document.getElementById("out").textContent =
+          "❌ Error loading log.";
+      });
+  </script>
 </body>
 </html>
