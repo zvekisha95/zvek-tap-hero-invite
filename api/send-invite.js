@@ -1,11 +1,10 @@
 // /api/send-invite.js
 
 export default async function handler(req) {
-  // Always respond quickly
   try {
     const { email, trap } = await req.json();
 
-    // Honeypot (bots fill hidden field)
+    // Honeypot
     if (trap) {
       return new Response(JSON.stringify({ ok: false, error: "Bot blocked" }), { status: 400 });
     }
@@ -15,7 +14,7 @@ export default async function handler(req) {
       return new Response(JSON.stringify({ ok: false, error: "Gmail only" }), { status: 400 });
     }
 
-    // RATE LIMIT (only 1 request per IP / 30 sec)
+    // RATE LIMIT – 1 request / 30 sec
     const ip = req.headers.get("x-forwarded-for") || "unknown";
     globalThis.limits = globalThis.limits || {};
     const now = Date.now();
@@ -26,11 +25,11 @@ export default async function handler(req) {
 
     globalThis.limits[ip] = now;
 
-    // Prepare log storage
+    // LOG STORAGE
     globalThis.inviteLog = globalThis.inviteLog || [];
     globalThis.inviteLog.push({ email, time: new Date().toISOString(), ip });
 
-    // Send email through RESEND
+    // Resend API
     const apiKey = Deno.env.get("RESEND_API_KEY");
     const link = Deno.env.get("TEST_LINK");
 
@@ -41,15 +40,14 @@ export default async function handler(req) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        from: "Zvek Tap Hero <invite@zvekisha.dev>",
+        from: "Zvek Tap Hero <onboarding@resend.dev>",
         to: email,
         subject: "Your Zvek Tap Hero Access Link",
-        html: `<h1>Zvek Access Granted</h1><p>Your link:</p><a href="${link}">${link}</a>`
+        html: `<h1>Access Granted</h1><p>Tap below:</p><a href="${link}">${link}</a>`
       })
     });
 
     return new Response(JSON.stringify({ ok: true }), { status: 200 });
-
   } catch (err) {
     return new Response(JSON.stringify({ ok: false, error: err.message }), { status: 500 });
   }
