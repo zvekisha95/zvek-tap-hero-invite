@@ -29,7 +29,6 @@
     color: #fff;
   }
 
-  /* Title glow */
   h1 {
     font-size: 32px;
     margin: 0 0 6px;
@@ -41,7 +40,6 @@
     -webkit-text-fill-color: transparent;
   }
 
-  /* Card container */
   .card {
     width: 92%;
     max-width: 460px;
@@ -56,7 +54,6 @@
     overflow: hidden;
   }
 
-  /* Moving neon grid in the background */
   .card::before {
     content: "";
     position: absolute;
@@ -79,7 +76,16 @@
     line-height: 1.4;
   }
 
-  /* Input */
+  /* 🔥 NEW LORE LINE */
+  .lore {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 14px;
+    color: #cfcfcf;
+    opacity: 0.9;
+    line-height: 1.45;
+  }
+
   input {
     width: 100%;
     padding: 14px;
@@ -98,7 +104,6 @@
     box-shadow: 0 0 12px var(--accent-glow);
   }
 
-  /* Button */
   button {
     width: 100%;
     padding: 15px;
@@ -146,7 +151,17 @@
 
 <div class="card">
   <h1>Zvek Access</h1>
-  <div class="subtitle">Enter the testing gateway for <b>Zvek Tap Hero</b>.<br> Selected testers only.</div>
+
+  <div class="subtitle">
+    Enter the testing gateway for <b>Zvek Tap Hero</b>.<br>
+    Selected testers only.
+  </div>
+
+  <!-- 🔥 THE PHOENIX PROTOCOL LORE LINE -->
+  <div class="lore">
+    “Beyond this portal lies the experimental build known as <b>Phoenix Protocol</b>.<br>
+    Faster storms. Smarter obstacles. A flight only a few can master.”
+  </div>
 
   <input id="email" type="email" placeholder="yourname@gmail.com">
   <button onclick="sendInvite()">ACTIVATE ACCESS</button>
