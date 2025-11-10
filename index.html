@@ -1,159 +1,195 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Zvek Tap Hero — Official Tester Invite</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zvek Tap Hero — Access Gate</title>
 
-  <style>
-    :root {
-      --bg: #0c0c0c;
-      --card: #151515;
-      --border: #2a2a2a;
-      --accent: #ff8800;
-      --accent-glow: rgba(255, 136, 0, 0.35);
-      --text-muted: #b3b3b3;
-      --radius: 14px;
-      --transition: 0.25s ease;
-    }
+<style>
+  :root {
+    --bg: #050505;
+    --card: #0d0d0d;
+    --secondary: #161616;
+    --accent: #ff8f1f;
+    --accent-glow: rgba(255,135,31,0.55);
+    --txt-muted: #8e8e8e;
+    --radius: 18px;
+    --transition: 0.3s ease;
+  }
 
-    * { box-sizing: border-box; }
+  * { box-sizing: border-box; }
 
-    body {
-      margin: 0;
-      height: 100vh;
-      display: grid;
-      place-items: center;
-      background: var(--bg);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      color: #fff;
-    }
+  body {
+    background: radial-gradient(circle at top, #1a1a1a, #050505 70%);
+    margin: 0;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    font-family: "Inter", system-ui, sans-serif;
+    color: #fff;
+  }
 
-    .card {
-      width: 90%;
-      max-width: 440px;
-      background: var(--card);
-      padding: 32px;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      box-shadow: 0 0 40px rgba(0,0,0,0.45);
-      animation: fadeIn 0.6s ease;
-    }
+  /* Title glow */
+  h1 {
+    font-size: 32px;
+    margin: 0 0 6px;
+    text-align: center;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(90deg, #ff8f1f, #ffaf4b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 
-    h1 {
-      margin: 0 0 6px 0;
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
+  /* Card container */
+  .card {
+    width: 92%;
+    max-width: 460px;
+    background: var(--card);
+    padding: 34px;
+    border-radius: var(--radius);
+    border: 1px solid #222;
+    box-shadow: 0 0 40px rgba(0,0,0,0.65), 0 0 25px rgba(255,135,31,0.15);
+    animation: fadeIn 0.7s ease forwards;
+    backdrop-filter: blur(4px);
+    position: relative;
+    overflow: hidden;
+  }
 
-    p {
-      margin: 0 0 20px 0;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
+  /* Moving neon grid in the background */
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(255,140,30,0.04),
+      rgba(255,140,30,0.04) 6px,
+      transparent 6px,
+      transparent 12px
+    );
+    animation: pulseGrid 6s linear infinite;
+  }
 
-    input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid var(--border);
-      background: #0a0a0a;
-      border-radius: var(--radius);
-      color: #fff;
-      font-size: 16px;
-      outline: none;
-      transition: var(--transition);
-    }
+  .subtitle {
+    text-align: center;
+    margin-top: 4px;
+    font-size: 15px;
+    color: var(--txt-muted);
+    line-height: 1.4;
+  }
 
-    input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 8px var(--accent-glow);
-    }
+  /* Input */
+  input {
+    width: 100%;
+    padding: 14px;
+    margin-top: 22px;
+    border-radius: var(--radius);
+    border: 1px solid #333;
+    background: var(--secondary);
+    color: #fff;
+    font-size: 17px;
+    outline: none;
+    transition: var(--transition);
+  }
 
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 14px;
-      border: none;
-      border-radius: var(--radius);
-      background: var(--accent);
-      color: #000;
-      font-weight: 700;
-      font-size: 17px;
-      cursor: pointer;
-      transition: var(--transition);
-      box-shadow: 0 4px 18px var(--accent-glow);
-    }
+  input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
 
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 26px var(--accent-glow);
-    }
+  /* Button */
+  button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 18px;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: #000;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border: none;
+    transition: var(--transition);
+    box-shadow: 0 6px 20px var(--accent-glow);
+  }
 
-    #msg {
-      margin-top: 18px;
-      font-size: 15px;
-      min-height: 20px;
-    }
+  button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 26px var(--accent-glow);
+  }
 
-    .ok { color: #22c55e; }
-    .err { color: #ef4444; }
+  #msg {
+    margin-top: 20px;
+    font-size: 16px;
+    min-height: 20px;
+    text-align: center;
+  }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+  .ok { color: #2ee168; }
+  .err { color: #ef3c3c; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulseGrid {
+    0% { transform: translate(0,0); }
+    100% { transform: translate(-40px, -40px); }
+  }
+</style>
 </head>
 
 <body>
 
-  <main class="card">
-    <h1>Zvek Tap Hero Testing</h1>
-    <p>Enter your <b>Gmail</b> to receive your official Google Play tester invitation.</p>
+<div class="card">
+  <h1>Zvek Access</h1>
+  <div class="subtitle">Enter the testing gateway for <b>Zvek Tap Hero</b>.<br> Selected testers only.</div>
 
-    <input id="email" type="email" placeholder="name@gmail.com" />
-    <button onclick="sendInvite()">Send Invite</button>
+  <input id="email" type="email" placeholder="yourname@gmail.com">
+  <button onclick="sendInvite()">ACTIVATE ACCESS</button>
 
-    <div id="msg"></div>
-  </main>
+  <div id="msg"></div>
+</div>
 
-  <script>
-    async function sendInvite() {
-      const email = document.getElementById("email").value.trim();
-      const msg = document.getElementById("msg");
+<script>
+async function sendInvite() {
+  const email = document.getElementById("email").value.trim();
+  const msg = document.getElementById("msg");
 
-      if (!email.endsWith("@gmail.com")) {
-        msg.textContent = "⛔ Gmail only (must end with @gmail.com)";
-        msg.className = "err";
-        return;
-      }
+  if (!email.endsWith("@gmail.com")) {
+    msg.className = "err";
+    msg.textContent = "⛔ Only Gmail accounts allowed.";
+    return;
+  }
 
-      msg.textContent = "⏳ Sending...";
-      msg.className = "";
+  msg.className = "";
+  msg.textContent = "⏳ Processing…";
 
-      try {
-        const res = await fetch("/api/send-invite", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email })
-        });
+  try {
+    const res = await fetch("/api/send-invite", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
 
-        const data = await res.json();
+    const data = await res.json();
 
-        if (data.ok) {
-          msg.textContent = "✅ Invite sent successfully! Check your Gmail.";
-          msg.className = "ok";
-        } else {
-          msg.textContent = "❌ Error: " + (data.error || "Unknown");
-          msg.className = "err";
-        }
-      } catch (err) {
-        msg.textContent = "❌ Network error.";
-        msg.className = "err";
-      }
+    if (data.ok) {
+      msg.className = "ok";
+      msg.textContent = "✅ Access link sent! Check your Gmail.";
+    } else {
+      msg.className = "err";
+      msg.textContent = "❌ Error: " + (data.error || "Unknown");
     }
-  </script>
+  } catch (err) {
+    msg.className = "err";
+    msg.textContent = "❌ Network error.";
+  }
+}
+</script>
 
 </body>
 </html>
