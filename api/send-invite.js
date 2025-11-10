@@ -6,7 +6,7 @@ export default async function handler(req) {
   try {
     const { email, trap } = await req.json();
 
-    // Honeypot
+    // Honeypot for bots
     if (trap) {
       return new Response(JSON.stringify({ ok: false, error: "Bot blocked" }), { status: 400 });
     }
@@ -16,7 +16,7 @@ export default async function handler(req) {
       return new Response(JSON.stringify({ ok: false, error: "Gmail only" }), { status: 400 });
     }
 
-    // RATE LIMIT – 1 request / 30 sec
+    // RATE LIMIT – 1 request / 30 sec per IP
     const ip = req.headers.get("x-forwarded-for") || "unknown";
     globalThis.limits = globalThis.limits || {};
     const now = Date.now();
@@ -30,15 +30,15 @@ export default async function handler(req) {
 
     globalThis.limits[ip] = now;
 
-    // LOG STORAGE
+    // Log
     globalThis.inviteLog = globalThis.inviteLog || [];
     globalThis.inviteLog.push({ email, time: new Date().toISOString(), ip });
 
-    // ENV VARS
-    const apiKey = Deno.env.get("RESEND_API_KEY");
-    const link = Deno.env.get("TEST_LINK");
+    // ✅ IMPORTANT: Edge Runtime → USE process.env
+    const apiKey = process.env.RESEND_API_KEY;
+    const link = process.env.TEST_LINK;
 
-    // SEND EMAIL
+    // Send email with Resend
     await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -54,31 +54,29 @@ export default async function handler(req) {
             🔥 Welcome to the Zvek Tap Hero Testing Program
           </h1>
 
-          <p style="font-size:16px; font-family:Arial; color:#222;">
+          <p style="font-size:16px;">
             You've been selected to join the <b>official tester squad</b> for Zvek Tap Hero.
           </p>
 
-          <p style="font-size:15px; font-family:Arial;">
-            ✅ <b>Step 1 — Join the Official Tester Group:</b><br>
-            <a href="https://groups.google.com/g/zvektaphero-testers" style="font-size:16px; color:#ff8f1f;">
+          <p>
+            ✅ <b>Step 1 — Join the Tester Group:</b><br>
+            <a href="https://groups.google.com/g/zvektaphero-testers" style="color:#ff8f1f;">
               https://groups.google.com/g/zvektaphero-testers
             </a>
           </p>
 
-          <p style="font-size:15px; font-family:Arial;">
+          <p>
             ✅ <b>Step 2 — Download the Game:</b><br>
-            <a href="${link}" style="font-size:16px; color:#ff8f1f;">
-              ${link}
-            </a>
+            <a href="${link}" style="color:#ff8f1f;">${link}</a>
           </p>
 
-          <p style="margin-top:20px; font-size:15px; font-family:Arial;">
-            If the Play Store link opens blank, open it from your phone while logged into the Gmail you entered.
+          <p style="margin-top:20px;">
+            If Play Store opens blank, enter from your phone logged into this Gmail.
           </p>
 
-          <p style="margin-top:25px; font-size:15px; font-family:Arial;">
-            Good luck in the Sky Trial.<br>
-            <b>Zvekisha Dev Team ⚔️</b>
+          <p style="margin-top:25px;">
+            Good luck in The Sky Trial ⚔️<br>
+            <b>Zvekisha Dev Team</b>
           </p>
         `
       })
@@ -87,9 +85,6 @@ export default async function handler(req) {
     return new Response(JSON.stringify({ ok: true }), { status: 200 });
 
   } catch (err) {
-    return new Response(
-      JSON.stringify({ ok: false, error: err.message }),
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ ok: false, error: err.message }), { status: 500 });
   }
 }
