@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/zvektaphero-invite",
+      "destination": "https://zvek-tap-hero-invite-e524ggtn8-zvekishas-projects.vercel.app"
+    }
+  ]
+}
