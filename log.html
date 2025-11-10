@@ -1,10 +1,16 @@
-<pre id="out" style="color:white; font-size:15px; padding:20px; background:#111; height:100vh; margin:0;"></pre>
+<!doctype html>
+<html>
+<body style="background:#111; margin:0;">
+<pre id="out" style="color:white; font-size:15px; padding:20px;"></pre>
 
 <script>
 fetch("/api/log")
-  .then(r => r.json())
-  .then(d => {
+  .then(r=>r.json())
+  .then(d=>{
     document.getElementById("out").textContent =
-      JSON.stringify(d, null, 2);
+      JSON.stringify(d,null,2);
   });
 </script>
+
+</body>
+</html>
