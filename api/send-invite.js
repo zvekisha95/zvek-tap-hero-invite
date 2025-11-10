@@ -1,48 +1,48 @@
-export default async (request) => {
+export default async (req) => {
   try {
-    const ip = request.headers.get("x-forwarded-for") || "0.0.0.0";
-    const { email } = await request.json();
+    const body = await req.json();
+    const email = (body.email || "").trim();
 
-    // Anti-bot: invalid gmail patterns
-    if (!email || !email.endsWith("@gmail.com")) {
-      return new Response(JSON.stringify({ error: "Gmail only." }), { status: 400 });
+    // Gmail check
+    if (!email.endsWith("@gmail.com")) {
+      return new Response(
+        JSON.stringify({ error: "Gmail only" }),
+        { status: 400 }
+      );
     }
 
-    // HARD domain block
-    if (!email.match(/^[a-zA-Z0-9._%+-]+@gmail\.com$/)) {
-      return new Response(JSON.stringify({ error: "Invalid Gmail." }), { status: 400 });
-    }
-
-    // RATE LIMIT — max 1 request per IP per minute
-    globalThis.ipHits = globalThis.ipHits || {};
+    // Rate-limit (anti-spam)
+    const ip = req.headers.get("x-forwarded-for") || "unknown";
+    globalThis.rateLimit = globalThis.rateLimit || {};
     const now = Date.now();
-    const lastHit = globalThis.ipHits[ip] || 0;
 
-    if (now - lastHit < 60000) {
-      return new Response(JSON.stringify({ error: "Too many requests. Try again." }), { status: 429 });
+    if (!globalThis.rateLimit[ip]) {
+      globalThis.rateLimit[ip] = [];
     }
-    globalThis.ipHits[ip] = now;
+    
+    // Clean old timestamps (1 hour)
+    globalThis.rateLimit[ip] = globalThis.rateLimit[ip].filter(
+      t => now - t < 3600000
+    );
 
-    // EMAIL THROTTLE — max 3 emails per hour
-    globalThis.emailHits = globalThis.emailHits || {};
-    const record = globalThis.emailHits[email] || { count: 0, timestamp: now };
-
-    if (now - record.timestamp < 3600000 && record.count >= 3) {
-      return new Response(JSON.stringify({ error: "Rate limit: max 3 invites per hour." }), { status: 429 });
-    }
-
-    if (now - record.timestamp >= 3600000) {
-      record.count = 0;
-      record.timestamp = now;
+    if (globalThis.rateLimit[ip].length >= 3) {
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Try again." }),
+        { status: 429 }
+      );
     }
 
-    record.count++;
-    globalThis.emailHits[email] = record;
+    globalThis.rateLimit[ip].push(now);
 
-    // SECRET INVITE LOG (прочитај го на приватна URL)
+    // Invite log
     globalThis.inviteLog = globalThis.inviteLog || [];
-    globalThis.inviteLog.push({ email, ip, time: new Date().toISOString() });
+    globalThis.inviteLog.push({
+      email,
+      ip,
+      time: new Date().toISOString()
+    });
 
+    // SEND EMAIL
     const apiKey = process.env.RESEND_API_KEY;
     const testerLink = process.env.TEST_LINK;
 
@@ -56,9 +56,7 @@ export default async (request) => {
         from: "Zvek Tap Hero <onboarding@resend.dev>",
         to: email,
         subject: "Zvek Tap Hero Tester Invite",
-        html: `<p>Welcome, warrior.</p>
-               <p>Your access is granted.</p>
-               <a href="${testerLink}">ENTER THE SKY TRIAL</a>`
+        html: `<p>Welcome tester!</p><p>Your link:</p><a href="${testerLink}">${testerLink}</a>`
       })
     });
 
@@ -68,4 +66,3 @@ export default async (request) => {
     return new Response(JSON.stringify({ error: err.message }), { status: 500 });
   }
 };
-
