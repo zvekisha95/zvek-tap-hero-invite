@@ -1,71 +1,71 @@
-let memory = {};
-
-export const config = {
-  runtime: "edge",
-};
-
-export default async function handler(request) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
-  const now = Date.now();
-  const today = new Date().toISOString().slice(0,10);
-
-  if (!memory[ip]) {
-    memory[ip] = { last: 0, count: 0, day: today };
-  }
-
-  // reset daily counter
-  if (memory[ip].day !== today) {
-    memory[ip].day = today;
-    memory[ip].count = 0;
-  }
-
-  // limit 1 request per 20 seconds
-  if (now - memory[ip].last < 20000) {
-    return new Response(JSON.stringify({ error: "Too many requests. Try again." }), {
-      status: 429
-    });
-  }
-
-  // max 5 per day
-  if (memory[ip].count >= 5) {
-    return new Response(JSON.stringify({ error: "Daily limit reached." }), {
-      status: 429
-    });
-  }
-
-  // update stats
-  memory[ip].last = now;
-  memory[ip].count++;
-
-  // email sending logic
+export default async (request) => {
   try {
-    const body = await request.json();
-    const email = (body.email || "").trim();
+    const ip = request.headers.get("x-forwarded-for") || "0.0.0.0";
+    const { email } = await request.json();
 
-    if (!email.endsWith("@gmail.com")) {
-      return new Response(JSON.stringify({ error: "Gmail only" }), { status: 400 });
+    // Anti-bot: invalid gmail patterns
+    if (!email || !email.endsWith("@gmail.com")) {
+      return new Response(JSON.stringify({ error: "Gmail only." }), { status: 400 });
     }
 
-    const API_KEY = process.env.RESEND_API_KEY;
-    const LINK = process.env.TEST_LINK;
+    // HARD domain block
+    if (!email.match(/^[a-zA-Z0-9._%+-]+@gmail\.com$/)) {
+      return new Response(JSON.stringify({ error: "Invalid Gmail." }), { status: 400 });
+    }
 
-    const res = await fetch("https://api.resend.com/emails", {
+    // RATE LIMIT — max 1 request per IP per minute
+    globalThis.ipHits = globalThis.ipHits || {};
+    const now = Date.now();
+    const lastHit = globalThis.ipHits[ip] || 0;
+
+    if (now - lastHit < 60000) {
+      return new Response(JSON.stringify({ error: "Too many requests. Try again." }), { status: 429 });
+    }
+    globalThis.ipHits[ip] = now;
+
+    // EMAIL THROTTLE — max 3 emails per hour
+    globalThis.emailHits = globalThis.emailHits || {};
+    const record = globalThis.emailHits[email] || { count: 0, timestamp: now };
+
+    if (now - record.timestamp < 3600000 && record.count >= 3) {
+      return new Response(JSON.stringify({ error: "Rate limit: max 3 invites per hour." }), { status: 429 });
+    }
+
+    if (now - record.timestamp >= 3600000) {
+      record.count = 0;
+      record.timestamp = now;
+    }
+
+    record.count++;
+    globalThis.emailHits[email] = record;
+
+    // SECRET INVITE LOG (прочитај го на приватна URL)
+    globalThis.inviteLog = globalThis.inviteLog || [];
+    globalThis.inviteLog.push({ email, ip, time: new Date().toISOString() });
+
+    const apiKey = process.env.RESEND_API_KEY;
+    const testerLink = process.env.TEST_LINK;
+
+    await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${API_KEY}`,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        from: "Zvek Tap Hero <invite@resend.dev>",
+        from: "Zvek Tap Hero <onboarding@resend.dev>",
         to: email,
         subject: "Zvek Tap Hero Tester Invite",
-        html: `<p>Click here:</p><a href="${LINK}">${LINK}</a>`
+        html: `<p>Welcome, warrior.</p>
+               <p>Your access is granted.</p>
+               <a href="${testerLink}">ENTER THE SKY TRIAL</a>`
       })
     });
 
     return new Response(JSON.stringify({ ok: true }), { status: 200 });
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: "Server error" }), { status: 500 });
+    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
   }
-}
+};
+
