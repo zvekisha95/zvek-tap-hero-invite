@@ -1,31 +1,34 @@
-export default async (request) => {
+export default async function handler(req, res) {
   try {
-    const { email } = await request.json();
-
-    if (!email || !email.endsWith("@gmail.com")) {
-      return new Response(JSON.stringify({ error: "Gmail only" }), { status: 400 });
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed" });
     }
 
-    const apiKey = Deno.env.get("RESEND_API_KEY");
-    const testerLink = Deno.env.get("TEST_LINK");
+    const { email } = req.body;
 
-    const res = await fetch("https://api.resend.com/emails", {
+    if (!email || !email.endsWith("@gmail.com")) {
+      return res.status(400).json({ error: "Gmail only" });
+    }
+
+    const apiKey = process.env.RESEND_API_KEY;
+    const testerLink = process.env.TEST_LINK;
+
+    const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
         from: "Zvek Tap Hero <onboarding@resend.dev>",
         to: email,
         subject: "Zvek Tap Hero Tester Invite",
-        html: `<p>Click here:</p><a href="${testerLink}">${testerLink}</a>`
+        html: `<p>Click here to join testing:</p><a href="${testerLink}">${testerLink}</a>`
       })
     });
 
-    return new Response(JSON.stringify({ ok: true }), { status: 200 });
-
+    return res.status(200).json({ ok: true });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    return res.status(500).json({ error: err.message });
   }
-};
+}
