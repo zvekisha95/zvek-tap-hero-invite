@@ -27,19 +27,38 @@
     place-items: center;
     font-family: "Inter", system-ui, sans-serif;
     color: #fff;
+    padding: 20px;
   }
 
-  h1 {
-    font-size: 32px;
-    margin: 0 0 6px;
+  /* INTRO – THE SKY TRIAL */
+  .intro {
     text-align: center;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 34px;
+    color: #d0d0d0;
+    opacity: 0;
+    animation: fadeIntro 1.2s ease forwards;
+    letter-spacing: 0.3px;
+  }
+
+  .intro span {
+    font-size: 20px;
     font-weight: 800;
-    letter-spacing: -1px;
-    background: linear-gradient(90deg, #ff8f1f, #ffaf4b);
+    background: linear-gradient(90deg, #ff8f1f, #ffb95c);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    display: inline-block;
+    margin-bottom: 4px;
+    text-shadow: 0 0 18px rgba(255,140,30,0.35);
   }
 
+  @keyframes fadeIntro {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* CARD */
   .card {
     width: 92%;
     max-width: 460px;
@@ -54,6 +73,7 @@
     overflow: hidden;
   }
 
+  /* NEON GRID ANIMATION */
   .card::before {
     content: "";
     position: absolute;
@@ -68,6 +88,23 @@
     animation: pulseGrid 6s linear infinite;
   }
 
+  @keyframes pulseGrid {
+    0% { transform: translate(0,0); }
+    100% { transform: translate(-40px, -40px); }
+  }
+
+  /* TITLE */
+  h1 {
+    font-size: 32px;
+    margin: 0 0 6px;
+    text-align: center;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(90deg, #ff8f1f, #ffaf4b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
   .subtitle {
     text-align: center;
     margin-top: 4px;
@@ -76,16 +113,7 @@
     line-height: 1.4;
   }
 
-  /* 🔥 NEW LORE LINE */
-  .lore {
-    margin-top: 12px;
-    text-align: center;
-    font-size: 14px;
-    color: #cfcfcf;
-    opacity: 0.9;
-    line-height: 1.45;
-  }
-
+  /* INPUT */
   input {
     width: 100%;
     padding: 14px;
@@ -104,6 +132,7 @@
     box-shadow: 0 0 12px var(--accent-glow);
   }
 
+  /* BUTTON */
   button {
     width: 100%;
     padding: 15px;
@@ -125,6 +154,7 @@
     box-shadow: 0 8px 26px var(--accent-glow);
   }
 
+  /* MESSAGE */
   #msg {
     margin-top: 20px;
     font-size: 16px;
@@ -135,33 +165,27 @@
   .ok { color: #2ee168; }
   .err { color: #ef3c3c; }
 
+  /* CARD FADE */
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes pulseGrid {
-    0% { transform: translate(0,0); }
-    100% { transform: translate(-40px, -40px); }
   }
 </style>
 </head>
 
 <body>
 
+<!-- INTRO ABOVE THE CARD -->
+<div class="intro">
+  <span>The Sky Trial</span><br>
+  A hidden stage above the clouds, where reflexes are sharpened<br>
+  and only the bold dare to rise. Your journey begins here.
+</div>
+
+<!-- MAIN CARD -->
 <div class="card">
   <h1>Zvek Access</h1>
-
-  <div class="subtitle">
-    Enter the testing gateway for <b>Zvek Tap Hero</b>.<br>
-    Selected testers only.
-  </div>
-
-  <!-- 🔥 THE PHOENIX PROTOCOL LORE LINE -->
-  <div class="lore">
-    “Beyond this portal lies the experimental build known as <b>Phoenix Protocol</b>.<br>
-    Faster storms. Smarter obstacles. A flight only a few can master.”
-  </div>
+  <div class="subtitle">Enter the testing gateway for <b>Zvek Tap Hero</b>.<br>Selected testers only.</div>
 
   <input id="email" type="email" placeholder="yourname@gmail.com">
   <button onclick="sendInvite()">ACTIVATE ACCESS</button>
