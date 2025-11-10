@@ -1,5 +1,6 @@
-// /api/log.js
-export default function handler(req, res) {
-  global.inviteLog = global.inviteLog || [];
-  return res.status(200).json(global.inviteLog);
-}
+export default () => {
+  return new Response(
+    JSON.stringify(globalThis.inviteLog || []),
+    { status: 200 }
+  );
+};
