@@ -17,159 +17,108 @@
     --transition: 0.3s ease;
   }
 
-  * { box-sizing: border-box; }
+  *{box-sizing:border-box;}
 
   body {
-    background: radial-gradient(circle at top, #1a1a1a, #050505 70%);
-    margin: 0;
-    min-height: 100vh;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    font-family: "Inter", system-ui, sans-serif;
-    color: #fff;
-    padding: 20px;
+    background:#070707;
+    margin:0;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    font-family:"Inter",sans-serif;
+    color:#fff;
   }
 
-  /* INTRO – THE SKY TRIAL */
-  .intro {
-    text-align: center;
-    font-size: 16px;
-    line-height: 1.5;
-    margin-bottom: 26px;
-    color: #d0d0d0;
-    opacity: 0;
-    animation: fadeIntro 1.2s ease forwards;
-    letter-spacing: 0.3px;
+  h2 {
+    font-size:36px;
+    margin-bottom:25px;
+    background:linear-gradient(90deg,#ff8f1f,#ffa940);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    letter-spacing:-1px;
+    font-weight:900;
   }
 
-  .intro span {
-    font-size: 22px;
-    font-weight: 800;
-    background: linear-gradient(90deg, #ff8f1f, #ffb95c);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-    margin-bottom: 4px;
-    text-shadow: 0 0 18px rgba(255,140,30,0.35);
-  }
-
-  @keyframes fadeIntro {
-    from { opacity: 0; transform: translateY(-8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* CARD (without animated grid) */
   .card {
-    width: 92%;
-    max-width: 460px;
-    background: var(--card);
-    padding: 34px;
-    border-radius: var(--radius);
-    border: 1px solid #222;
-    box-shadow: 0 0 40px rgba(0,0,0,0.65), 0 0 25px rgba(255,135,31,0.15);
-    animation: fadeIn 0.7s ease forwards;
-    backdrop-filter: blur(4px);
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* TITLE */
-  h1 {
-    font-size: 32px;
-    margin: 0 0 6px;
-    text-align: center;
-    font-weight: 800;
-    letter-spacing: -1px;
-    background: linear-gradient(90deg, #ff8f1f, #ffaf4b);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    width:92%;
+    max-width:460px;
+    background:var(--card);
+    padding:34px;
+    border-radius:var(--radius);
+    border:1px solid #222;
+    box-shadow:0 0 40px rgba(0,0,0,0.65),0 0 25px rgba(255,135,31,0.12);
+    position:relative;
+    overflow:hidden;
+    animation:fadeIn .7s ease forwards;
   }
 
   .subtitle {
-    text-align: center;
-    margin-top: 4px;
-    font-size: 15px;
-    color: var(--txt-muted);
-    line-height: 1.4;
+    font-size:15px;
+    text-align:center;
+    color:var(--txt-muted);
+    margin-bottom:20px;
   }
 
-  /* INPUT */
   input {
-    width: 100%;
-    padding: 14px;
-    margin-top: 22px;
-    border-radius: var(--radius);
-    border: 1px solid #333;
-    background: var(--secondary);
-    color: #fff;
-    font-size: 17px;
-    outline: none;
-    transition: var(--transition);
+    width:100%;
+    padding:14px;
+    border-radius:var(--radius);
+    border:1px solid #333;
+    background:var(--secondary);
+    color:#fff;
+    font-size:17px;
+    margin-top:15px;
   }
 
-  input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 12px var(--accent-glow);
-  }
-
-  /* BUTTON */
   button {
-    width: 100%;
-    padding: 15px;
-    margin-top: 18px;
-    border-radius: var(--radius);
-    background: var(--accent);
-    color: #000;
-    font-size: 18px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    border: none;
-    transition: var(--transition);
-    box-shadow: 0 6px 20px var(--accent-glow);
+    width:100%;
+    padding:15px;
+    border-radius:var(--radius);
+    background:var(--accent);
+    color:#000;
+    font-weight:900;
+    font-size:18px;
+    cursor:pointer;
+    border:none;
+    margin-top:18px;
+    letter-spacing:1px;
+    box-shadow:0 0 20px var(--accent-glow);
+    transition:var(--transition);
   }
 
-  button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 26px var(--accent-glow);
+  button:hover { transform:translateY(-3px); }
+
+  #msg { text-align:center; margin-top:16px; min-height:20px; font-size:16px; }
+
+  .ok{color:#2ee168;}
+  .err{color:#ef4444;}
+
+  /* HONEYPOT — скриена стапица за ботови */
+  .honey {
+    position:absolute;
+    left:-9999px;
+    top:-9999px;
+    opacity:0;
   }
 
-  /* MESSAGE */
-  #msg {
-    margin-top: 20px;
-    font-size: 16px;
-    min-height: 20px;
-    text-align: center;
-  }
-
-  .ok { color: #2ee168; }
-  .err { color: #ef3c3c; }
-
-  /* ANIMS */
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity:0; transform:translateY(10px); }
+    to { opacity:1; transform:translateY(0); }
   }
 </style>
 </head>
 
 <body>
 
-<!-- INTRO ABOVE THE CARD -->
-<div class="intro">
-  <span>The Sky Trial</span><br>
-  A hidden stage above the clouds, where reflexes sharpen<br>
-  and only the bold dare to rise. Your journey begins now.
-</div>
+<h2>The Sky Trial</h2>
 
-<!-- MAIN CARD -->
 <div class="card">
-  <h1>Zvek Access</h1>
-  <div class="subtitle">Enter the testing gateway for <b>Zvek Tap Hero</b>.<br>Selected testers only.</div>
+  <div class="subtitle">Enter the testing gateway for <b>Zvek Tap Hero</b>.<br> Selected testers only.</div>
+
+  <!-- HONEYPOT for bots -->
+  <input id="trap" class="honey" type="text" autocomplete="off">
 
   <input id="email" type="email" placeholder="yourname@gmail.com">
   <button onclick="sendInvite()">ACTIVATE ACCESS</button>
@@ -177,39 +126,49 @@
   <div id="msg"></div>
 </div>
 
+<!-- Sci-Fi Unlock Sound -->
+<audio id="okSound">
+  <source src="https://assets.mixkit.co/sfx/download/mixkit-arcade-bonus-alert-767.wav">
+</audio>
+
 <script>
 async function sendInvite() {
   const email = document.getElementById("email").value.trim();
+  const honey = document.getElementById("trap").value;
   const msg = document.getElementById("msg");
+  const okSound = document.getElementById("okSound");
 
-  if (!email.endsWith("@gmail.com")) {
-    msg.className = "err";
-    msg.textContent = "⛔ Only Gmail accounts allowed.";
+  msg.textContent = "";
+
+  if (honey.length > 0) {
+    msg.className="err";
+    msg.textContent="❌ Bot detected.";
     return;
   }
 
-  msg.className = "";
-  msg.textContent = "⏳ Processing…";
+  if (!email.endsWith("@gmail.com")) {
+    msg.className="err";
+    msg.textContent="⛔ Gmail only!";
+    return;
+  }
 
-  try {
-    const res = await fetch("/api/send-invite", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email })
-    });
+  msg.textContent="⏳ Processing…";
 
-    const data = await res.json();
+  const res = await fetch("/api/send-invite", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ email })
+  });
 
-    if (data.ok) {
-      msg.className = "ok";
-      msg.textContent = "✅ Access link sent! Check your Gmail.";
-    } else {
-      msg.className = "err";
-      msg.textContent = "❌ Error: " + (data.error || "Unknown");
-    }
-  } catch (err) {
-    msg.className = "err";
-    msg.textContent = "❌ Network error.";
+  const data = await res.json();
+
+  if (data.ok) {
+    msg.className="ok";
+    msg.textContent="✅ Access link sent!";
+    okSound.play();
+  } else {
+    msg.className="err";
+    msg.textContent="❌ " + (data.error || "Error");
   }
 }
 </script>
