@@ -1,1 +1,10 @@
+<pre id="out" style="color:white; font-size:15px; padding:20px; background:#111; height:100vh; margin:0;"></pre>
 
+<script>
+fetch("/api/log")
+  .then(r => r.json())
+  .then(d => {
+    document.getElementById("out").textContent =
+      JSON.stringify(d, null, 2);
+  });
+</script>
