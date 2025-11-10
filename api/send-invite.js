@@ -1,19 +1,32 @@
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ ok: false, error: "Method not allowed" });
-  }
-
-  const { email } = req.body;
-
-  if (!email || !email.endsWith("@gmail.com")) {
-    return res.status(400).json({ ok: false, error: "Gmail only" });
-  }
-
-  const apiKey = process.env.RESEND_API_KEY;
-  const link = process.env.TEST_LINK;
-
+export default async function handler(req) {
   try {
-    await fetch("https://api.resend.com/emails", {
+    const { email, trap } = await req.json();
+
+    if (trap) {
+      return new Response(JSON.stringify({ ok: false, error: "Bot blocked" }), { status: 400 });
+    }
+
+    if (!email || !email.endsWith("@gmail.com")) {
+      return new Response(JSON.stringify({ ok: false, error: "Gmail only" }), { status: 400 });
+    }
+
+    const ip = req.headers.get("x-forwarded-for") || "unknown";
+    globalThis.limits = globalThis.limits || {};
+    const now = Date.now();
+
+    if (globalThis.limits[ip] && now - globalThis.limits[ip] < 30000) {
+      return new Response(JSON.stringify({ ok: false, error: "Too many requests. Try again." }), { status: 429 });
+    }
+
+    globalThis.limits[ip] = now;
+
+    globalThis.inviteLog = globalThis.inviteLog || [];
+    globalThis.inviteLog.push({ email, time: new Date().toISOString(), ip });
+
+    const apiKey = Deno.env.get("RESEND_API_KEY");
+    const link = Deno.env.get("TEST_LINK");
+
+    const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
@@ -23,12 +36,44 @@ export default async function handler(req, res) {
         from: "Zvek Tap Hero <onboarding@resend.dev>",
         to: email,
         subject: "Your Zvek Tap Hero Access Link",
-        html: `<h1>Access Granted</h1><p>Tap below:</p><a href="${link}">${link}</a>`
+        html: `
+          <h1 style="color:#ff8f1f; font-family:Arial; margin-bottom:12px;">
+            🔥 Welcome to the Zvek Tap Hero Testing Program
+          </h1>
+
+          <p style="font-size:16px; font-family:Arial; color:#222;">
+            You've been selected to join the <b>official tester squad</b> for Zvek Tap Hero.
+          </p>
+
+          <p style="font-size:15px; font-family:Arial;">
+            ✅ <b>Step 1 — Join the Official Tester Group:</b><br>
+            <a href="https://groups.google.com/g/zvektaphero-testers" style="font-size:16px; color:#ff8f1f;">
+              https://groups.google.com/g/zvektaphero-testers
+            </a>
+          </p>
+
+          <p style="font-size:15px; font-family:Arial;">
+            ✅ <b>Step 2 — Download the Game:</b><br>
+            <a href="${link}" style="font-size:16px; color:#ff8f1f;">
+              ${link}
+            </a>
+          </p>
+
+          <p style="margin-top:20px; font-size:15px; font-family:Arial;">
+            If the Play Store link opens blank, open it from your phone while logged into the Gmail you entered.
+          </p>
+
+          <p style="margin-top:25px; font-size:15px; font-family:Arial;">
+            Good luck in the Sky Trial.<br>
+            <b>Zvekisha Dev Team ⚔️</b>
+          </p>
+        `
       })
     });
 
-    return res.status(200).json({ ok: true });
+    return new Response(JSON.stringify({ ok: true }), { status: 200 });
+
   } catch (err) {
-    return res.status(500).json({ ok: false, error: err.message });
+    return new Response(JSON.stringify({ ok: false, error: err.message }), { status: 500 });
   }
 }
