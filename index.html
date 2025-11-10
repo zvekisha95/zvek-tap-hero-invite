@@ -24,7 +24,6 @@
     margin: 0;
     min-height: 100vh;
 
-    /* Центрирање на се */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -63,7 +62,7 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* CARD */
+  /* CARD (without animated grid) */
   .card {
     width: 92%;
     max-width: 460px;
@@ -76,27 +75,6 @@
     backdrop-filter: blur(4px);
     position: relative;
     overflow: hidden;
-  }
-
-  /* NEON GRID ANIMATION */
-  .card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      45deg,
-      rgba(255,140,30,0.04),
-      rgba(255,140,30,0.04) 6px,
-      transparent 6px,
-      transparent 12px
-    );
-    animation: pulseGrid 6s linear infinite;
-    pointer-events: none;
-  }
-
-  @keyframes pulseGrid {
-    0% { transform: translate(0,0); }
-    100% { transform: translate(-40px, -40px); }
   }
 
   /* TITLE */
@@ -171,10 +149,10 @@
   .ok { color: #2ee168; }
   .err { color: #ef3c3c; }
 
-  /* CARD FADE */
+  /* ANIMS */
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 </style>
 </head>
