@@ -1,172 +1,45 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Zvek Tap Hero — Access Gate</title>
-
-<style>
-  :root {
-    --bg: #050505;
-    --card: #0d0d0d;
-    --secondary: #161616;
-    --accent: #ff8f1f;
-    --accent-glow: rgba(255,135,31,0.55);
-    --txt-muted: #8e8e8e;
-    --radius: 18px;
-    --transition: 0.3s ease;
-  }
-
-  *{box-sizing:border-box;}
-
-  body {
-    background:#070707;
-    margin:0;
-    height:100vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    font-family:"Inter",sans-serif;
-    color:#fff;
-  }
-
-  h2 {
-    font-size:36px;
-    margin-bottom:25px;
-    background:linear-gradient(90deg,#ff8f1f,#ffa940);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    letter-spacing:-1px;
-    font-weight:900;
-  }
-
-  .card {
-    width:92%;
-    max-width:460px;
-    background:var(--card);
-    padding:34px;
-    border-radius:var(--radius);
-    border:1px solid #222;
-    box-shadow:0 0 40px rgba(0,0,0,0.65),0 0 25px rgba(255,135,31,0.12);
-    position:relative;
-    overflow:hidden;
-    animation:fadeIn .7s ease forwards;
-  }
-
-  .subtitle {
-    font-size:15px;
-    text-align:center;
-    color:var(--txt-muted);
-    margin-bottom:20px;
-  }
-
-  input {
-    width:100%;
-    padding:14px;
-    border-radius:var(--radius);
-    border:1px solid #333;
-    background:var(--secondary);
-    color:#fff;
-    font-size:17px;
-    margin-top:15px;
-  }
-
-  button {
-    width:100%;
-    padding:15px;
-    border-radius:var(--radius);
-    background:var(--accent);
-    color:#000;
-    font-weight:900;
-    font-size:18px;
-    cursor:pointer;
-    border:none;
-    margin-top:18px;
-    letter-spacing:1px;
-    box-shadow:0 0 20px var(--accent-glow);
-    transition:var(--transition);
-  }
-
-  button:hover { transform:translateY(-3px); }
-
-  #msg { text-align:center; margin-top:16px; min-height:20px; font-size:16px; }
-
-  .ok{color:#2ee168;}
-  .err{color:#ef4444;}
-
-  /* HONEYPOT */
-  .honey {
-    position:absolute;
-    left:-9999px;
-    top:-9999px;
-    opacity:0;
-  }
-
-  @keyframes fadeIn {
-    from { opacity:0; transform:translateY(10px); }
-    to { opacity:1; transform:translateY(0); }
-  }
-</style>
+  <meta charset="utf-8">
+  <title>Zvek Tap Hero — Invite</title>
 </head>
+<body style="background:#111; color:white; font-family:sans-serif; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh;">
 
-<body>
+  <h2>Zvek Tap Hero Access</h2>
+  <p>Enter your Gmail:</p>
 
-<h2>The Sky Trial</h2>
+  <input id="email" type="email" placeholder="yourname@gmail.com" style="padding:10px; font-size:16px;">
+  <button onclick="sendInvite()" style="padding:10px 20px; font-size:18px; margin-top:10px;">Send Invite</button>
 
-<div class="card">
-  <div class="subtitle">Enter the testing gateway for <b>Zvek Tap Hero</b>.<br> Selected testers only.</div>
-
-  <input id="trap" class="honey" type="text" autocomplete="off">
-
-  <input id="email" type="email" placeholder="yourname@gmail.com">
-  <button onclick="sendInvite()">ACTIVATE ACCESS</button>
-
-  <div id="msg"></div>
-</div>
-
-<audio id="okSound">
-  <source src="https://assets.mixkit.co/sfx/download/mixkit-arcade-bonus-alert-767.wav">
-</audio>
+  <div id="msg" style="margin-top:15px;"></div>
 
 <script>
 async function sendInvite() {
   const email = document.getElementById("email").value.trim();
-  const honey = document.getElementById("trap").value;
   const msg = document.getElementById("msg");
-  const okSound = document.getElementById("okSound");
 
   msg.textContent = "";
 
-  if (honey.length > 0) {
-    msg.className="err";
-    msg.textContent="❌ Bot detected.";
-    return;
-  }
-
   if (!email.endsWith("@gmail.com")) {
-    msg.className="err";
-    msg.textContent="⛔ Gmail only!";
+    msg.textContent = "Gmail only!";
     return;
   }
 
-  msg.textContent="⏳ Processing…";
+  msg.textContent = "⏳ Sending...";
 
-  const res = await fetch("/api/send-invite", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ email })
-  });
+  try {
+    const res = await fetch("/api/send-invite", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
 
-  const data = await res.json();
-
-  if (data.ok) {
-    msg.className="ok";
-    msg.textContent="✅ Access link sent!";
-    okSound.play();
-  } else {
-    msg.className="err";
-    msg.textContent="❌ " + (data.error || "Error");
+    const data = await res.json();
+    if (data.ok) msg.textContent = "✅ Invite sent!";
+    else msg.textContent = "❌ Error: " + data.error;
+  } catch (e) {
+    msg.textContent = "❌ Network error.";
   }
 }
 </script>
