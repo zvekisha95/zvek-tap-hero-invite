@@ -9,31 +9,20 @@ export default async function handler(req) {
       );
     }
 
-    // Resend API vars
     const apiKey = Deno.env.get("RESEND_API_KEY");
     const link = Deno.env.get("TEST_LINK");
 
-    if (!apiKey || !link) {
-      return new Response(
-        JSON.stringify({ ok: false, error: "Missing API KEY" }),
-        { status: 500 }
-      );
-    }
-
-    // Send mail
-    await fetch("https://api.resend.com/emails", {
+    const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        from: "Zvek Tap Hero <invite@zvekisha.dev>",
+        from: "Zvek Tap Hero <onboarding@resend.dev>",
         to: email,
-        subject: "Your Zvek Tap Hero Access Link",
-        html: `<h1>Access Granted</h1>
-               <p>Your test link:</p>
-               <a href="${link}">${link}</a>`
+        subject: "Zvek Tap Hero Test Access",
+        html: `<h1>Your Access Link</h1><a href="${link}">${link}</a>`
       })
     });
 
